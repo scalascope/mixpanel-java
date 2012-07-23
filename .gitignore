@@ -1,6 +1,14 @@
-*.class
+/.idea
+/.idea_modules
+/out
+.history
+target
+workspace.xml
+# OS generated files #
+######################
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
 
-# Package Files #
-*.jar
-*.war
-*.ear
+
