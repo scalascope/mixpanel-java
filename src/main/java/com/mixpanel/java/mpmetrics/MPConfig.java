@@ -18,6 +18,8 @@ public class MPConfig {
     // and people requests will be sent to /engage
     public static final String BASE_ENDPOINT = "http://api.mixpanel.com";
 
+    public static final String EXPORT_BASE_ENDPOINT = "mixpanel.com/api/2.0";
+
     // Time in milliseconds that the submission thread must be idle for before it dies.
     // Must be reconfigured before the library is initialized for the first time.
     @SuppressWarnings("FieldCanBeLocal")
