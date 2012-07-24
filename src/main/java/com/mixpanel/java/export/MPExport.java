@@ -134,6 +134,46 @@ public class MPExport {
         return doRequestJSONArray("events/names", params);
     }
 
+    public JSONObject properties(String event, String name, MPExportType type, MPExportUnit unit, int interval) throws MPException {
+        return this.properties(event, name, null, type, unit, interval, -1);
+    }
+
+    public JSONObject properties(String event, String name, List<String> values, MPExportType type, MPExportUnit unit, int interval, int limit) throws MPException {
+        Map<String, Object> params = getParams();
+        params.put("event", event);
+        params.put("name", name);
+
+        if (values != null) {
+            JSONArray valuesJson = new JSONArray();
+
+            for (String value : values) {
+                valuesJson.put(value);
+            }
+        }
+
+        params.put("type", type);
+        params.put("unit", unit);
+        params.put("interval", interval);
+        if (limit > -1) {
+            params.put("limit", limit);
+        }
+
+        return doRequestJSONObject("events/properties", params);
+    }
+
+    public JSONObject topProperties(String event) throws MPException {
+        return this.topProperties(event, -1);
+    }
+
+    public JSONObject topProperties(String event, int limit) throws MPException {
+        Map<String, Object> params = getParams();
+        params.put("event", event);
+        if (limit > -1) {
+            params.put("limit", limit);
+        }
+        return doRequestJSONObject("events/properties/top", params);
+    }
+
     private List<JSONObject> doRequestRawJSONObject(String path, Map<String, Object> params) throws MPException {
         try {
             String resp = doRequest(path, params);
