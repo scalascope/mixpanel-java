@@ -1,11 +1,12 @@
 Java library for Mixpanel
 =============
 
-h2. Installation
+Installation
+------------
 
 Add the following repository to your pom.xml.
 
-bc.. <repository>
+	<repository>
 			<id>scalascope-releases</id>
 			<releases>
 				<enabled>true</enabled>
@@ -18,4 +19,4 @@ bc.. <repository>
 				<checksumpolicy>warn</checksumpolicy>
 			</snapshots>
 			<url>https://raw.github.com/scalascope/mavenrepo/master/releases</url>
-	 </repository>
+	</repository>
