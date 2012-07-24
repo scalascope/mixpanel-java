@@ -25,6 +25,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MPExport {
@@ -40,6 +41,45 @@ public class MPExport {
     public MPExport(String api_key, String api_secret) {
         this.api_key = api_key;
         this.api_secret = api_secret;
+    }
+
+    // Exporting raw data you inserted into Mixpanel
+    public List<JSONObject> export(Date fromDate, Date toDate) throws MPException {
+        return this.export(fromDate, toDate, null, null, null);
+    }
+
+    public List<JSONObject> export(Date fromDate, Date toDate, String event) throws MPException {
+        return this.export(fromDate, toDate, Arrays.asList(event), null, null);
+    }
+
+    public List<JSONObject> export(Date fromDate, Date toDate, List<String> events) throws MPException {
+        return this.export(fromDate, toDate, events, null, null);
+    }
+
+    public List<JSONObject> export(Date fromDate, Date toDate, List<String> events, String where, String bucket) throws MPException {
+        Map<String, Object> params = getParams();
+
+        if (events != null) {
+            JSONArray eventsJson = new JSONArray();
+
+            for (String event : events) {
+                eventsJson.put(event);
+            }
+
+            params.put("event", eventsJson.toString());
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        params.put("from_date", dateFormat.format(fromDate));
+        params.put("to_date", dateFormat.format(toDate));
+        if (where != null) {
+            params.put("where", where);
+        }
+        if (bucket != null) {
+            params.put("bucket", bucket);
+        }
+
+        return doRequestRawJSONObject("export", params);
     }
 
     public JSONObject events(String event, MPExportType type, MPExportUnit unit, int interval) throws MPException {
@@ -94,9 +134,28 @@ public class MPExport {
         return doRequestJSONArray("events/names", params);
     }
 
+    private List<JSONObject> doRequestRawJSONObject(String path, Map<String, Object> params) throws MPException {
+        try {
+            String resp = doRequest(path, params);
+            if (resp == null || resp.trim().isEmpty()) {
+                return Collections.emptyList();
+            } else {
+                List<JSONObject> jsonObjects = new ArrayList<JSONObject>();
+                for (String jsonString : resp.split("\n")) {
+                    jsonObjects.add(new JSONObject(jsonString));
+                }
+                return jsonObjects;
+            }
+        } catch (JSONException e) {
+            throw new MPException(e);
+        }
+    }
+
+
     private JSONObject doRequestJSONObject(String path, Map<String, Object> params) throws MPException {
         try {
-            return new JSONObject(doRequest(path, params));
+            String resp = doRequest(path, params);
+            return resp == null || resp.trim().isEmpty() ? new JSONObject() : new JSONObject(resp);
         } catch (JSONException e) {
             throw new MPException(e);
         }
@@ -104,7 +163,8 @@ public class MPExport {
 
     private JSONArray doRequestJSONArray(String path, Map<String, Object> params) throws MPException {
         try {
-            return new JSONArray(doRequest(path, params));
+            String resp = doRequest(path, params);
+            return resp == null || resp.trim().isEmpty() ? new JSONArray() : new JSONArray(resp);
         } catch (JSONException e) {
             throw new MPException(e);
         }
@@ -126,7 +186,10 @@ public class MPExport {
         }
 
         try {
-            URI uri = URIUtils.createURI("http", MPConfig.EXPORT_BASE_ENDPOINT, -1, "/" + path,
+
+            URI uri = URIUtils.createURI("http",
+                    path.equals("export") ? MPConfig.EXPORT_RAW_BASE_ENDPOINT : MPConfig.EXPORT_BASE_ENDPOINT,
+                    -1, "/" + path,
                     URLEncodedUtils.format(queryParams, "UTF-8"), null
             );
 
@@ -138,10 +201,15 @@ public class MPExport {
 
             String result = StringUtils.inputStreamToString(entity.getContent());
 
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new MPException(result);
+            }
+
             if (result.contains("'error':")) {
                 JSONObject responseJson = new JSONObject(result);
                 throw new MPException(responseJson.getString("error"), responseJson.getString("request"));
             }
+
             return result;
         } catch (Throwable e) {
             throw new MPException(e);
