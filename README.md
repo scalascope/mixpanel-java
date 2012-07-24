@@ -1,7 +1,7 @@
 Installation
 ------------
 
-Add the following repository to your pom.xml.
+Add the following repository to your pom.xml
 
 	<repository>
 			<id>scalascope-releases</id>
@@ -17,6 +17,14 @@ Add the following repository to your pom.xml.
 			</snapshots>
 			<url>https://raw.github.com/scalascope/mavenrepo/master/releases</url>
 	</repository>
+
+and maven dependency
+
+	<dependency>
+		<groupId>com.mixpanel</groupId>
+		<artifactId>mixpanel-java</artifactId>
+		<version>0.1</version>
+	</dependency>
 
 Configuration
 -------------
