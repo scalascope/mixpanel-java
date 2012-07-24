@@ -21,8 +21,8 @@ public class MPExportTest {
 
     private final static Logger log = LoggerFactory.getLogger(MPExportTest.class);
 
-    private static final String testApiKey = "ac23ab5785e1710efafc427f14fb02e9";
-    private static final String testApiSecret = "6be802eac69270cf18a8931920627378";
+    private static final String testApiKey = "";
+    private static final String testApiSecret = "";
 
     @Test
     public void events() throws MPException {
