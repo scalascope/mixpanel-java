@@ -1,6 +1,3 @@
-Java library for Mixpanel
-=============
-
 Installation
 ------------
 
@@ -20,3 +17,22 @@ Add the following repository to your pom.xml.
 			</snapshots>
 			<url>https://raw.github.com/scalascope/mavenrepo/master/releases</url>
 	</repository>
+
+Configuration
+-------------
+
+Put mixpanel.properties to the classpath.
+
+	mixpanel.submitThreadTTL = 180000
+	mixpanel.threadNumber = 3
+
+Use
+---
+
+	MPMetrics mpMetrics = MPMetrics.getInstance("your_token");
+	Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("ip", "123.123.123.123");
+    properties.put("action", "test");
+
+    mpMetrics.track("testEvent", properties);
+
